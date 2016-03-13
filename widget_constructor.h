@@ -13,9 +13,14 @@
 #include <QPushButton>
 #include <QMessageBox>
 
+#include "widget_settings.h"
+#include "core_pattern_manager.h"
+
 class widget_constructor : public QWidget
 {
 	Q_OBJECT
+
+	core_pattern_manager	*cpm;
 
 	QString					pattern;
 	QString					filename;
@@ -27,6 +32,9 @@ class widget_constructor : public QWidget
 	QTableWidget			*table_parts;
 	QLabel					*label_preview;
 	QPushButton				*button_apply;
+	QPushButton				*button_settings;
+
+	widget_settings			*settings;
 
 	std::map<QString, QString>					cat_to_text;
 	std::map<QString, QTableWidgetItem *>		cat_to_item;
@@ -36,10 +44,9 @@ class widget_constructor : public QWidget
 	void					construct					();
 
 public:
-	/*constructor*/			widget_constructor			(QWidget *parent = 0);
+	/*constructor*/			widget_constructor			(core_pattern_manager *cpm, QWidget *parent = 0);
 	/*destructor*/			~widget_constructor			();
 
-	void					set_pattern					(QString p);
 	void					reset						();
 
 public slots:
@@ -47,6 +54,8 @@ public slots:
 	void					slot_filename				(QString name);
 	void					slot_item_change			(int row, int col);
 	void					slot_apply					();
+	void					slot_patterns_updated		();
+	void					slot_pattern_changed		(QString name);
 
 signals:
 	void					signal_updated				();

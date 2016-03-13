@@ -4,9 +4,13 @@
 #include "widget_document.h"
 #include "widget_constructor.h"
 
+#include "core_pattern_manager.h"
+
 class widget_main : public QWidget
 {
 	Q_OBJECT
+
+	core_pattern_manager	*cpm;
 
 	QHBoxLayout				*layout_main;
 

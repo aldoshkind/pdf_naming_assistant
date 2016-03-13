@@ -5,8 +5,12 @@
 #include <QMouseEvent>
 #include <QMessageBox>
 
-/*constructor*/ widget_document::widget_document(QWidget *parent) : QWidget(parent)
+#include <QDebug>
+
+/*constructor*/ widget_document::widget_document(core_pattern_manager *c, QWidget *parent) : QWidget(parent)
 {
+	cpm = c;
+
 	layout_main = new QVBoxLayout(this);
 
 	label_image = new QLabel(this);
@@ -17,6 +21,7 @@
 	button_next = new  QPushButton("next", this);
 	button_prev = new  QPushButton("prev", this);
 	label_current = new QLabel(this);
+	combo_current_pattern = new QComboBox(this);
 
 	layout_control->addWidget(button_prev);
 	layout_control->addStretch(1);
@@ -24,12 +29,14 @@
 	layout_control->addStretch(1);
 	layout_control->addWidget(button_next);
 
+	layout_main->addWidget(combo_current_pattern);
 	layout_main->addWidget(label_image);
 	layout_main->addLayout(layout_control);
 
 	rubber = new QRubberBand(QRubberBand::Rectangle, label_image);
 
 	menu_fields = new QMenu(this);
+	menu_pats = new QMenu(this);
 
 	document = NULL;
 	page = NULL;
@@ -39,7 +46,12 @@
 	connect(menu_fields, SIGNAL(aboutToHide()), this, SLOT(slot_menu_hide()));
 	connect(button_next, SIGNAL(clicked()), this, SLOT(slot_next_page()));
 	connect(button_prev, SIGNAL(clicked()), this, SLOT(slot_prev_page()));
-	connect(menu_fields, SIGNAL(triggered(QAction*)), this, SLOT(slot_action_triggered(QAction*)));
+	connect(menu_fields, SIGNAL(triggered(QAction*)), this, SLOT(slot_field_filled(QAction*)));
+	connect(combo_current_pattern, SIGNAL(activated(QString)), this, SLOT(slot_pattern_selected(QString)));
+	connect(menu_pats, SIGNAL(triggered(QAction*)), this, SLOT(slot_pattern_selected(QAction*)));
+	connect(cpm, SIGNAL(signal_updated()), this, SLOT(slot_update_pats()));
+
+	slot_update_pats();
 }
 
 /*destructor*/ widget_document::~widget_document()
@@ -73,6 +85,13 @@ bool widget_document::eventFilter(QObject *, QEvent *ev)
 	if(ev->type() == QEvent::MouseButtonPress)
 	{
 		QMouseEvent *mev = dynamic_cast<QMouseEvent *>(ev);
+
+		if(mev->button() == Qt::RightButton)
+		{
+			menu_pats->popup(label_image->mapToGlobal(mev->pos()));
+			return false;
+		}
+
 		if(mev == NULL)
 		{
 			return false;
@@ -85,6 +104,12 @@ bool widget_document::eventFilter(QObject *, QEvent *ev)
 	if(ev->type() == QEvent::MouseMove)
 	{
 		QMouseEvent *mev = dynamic_cast<QMouseEvent*>(ev);
+
+		if(mev->buttons() & Qt::LeftButton == 0)
+		{
+			return false;
+		}
+
 		if(mev == NULL)
 		{
 			return false;
@@ -94,6 +119,12 @@ bool widget_document::eventFilter(QObject *, QEvent *ev)
 	if(ev->type() == QEvent::MouseButtonRelease)
 	{
 		QMouseEvent *mev = dynamic_cast<QMouseEvent*>(ev);
+
+		if(mev->button() == Qt::RightButton)
+		{
+			return false;
+		}
+
 		if(mev == NULL)
 		{
 			return false;
@@ -118,7 +149,7 @@ void widget_document::load_document(QString path)
 
 	if(document == NULL)
 	{
-		QMessageBox::critical(this, "Error", "Error opening file " + path);
+		QMessageBox::critical(this, tr("Error"), tr("Error opening file ") + path);
 		return;
 	}
 
@@ -151,14 +182,14 @@ void widget_document::show_page(unsigned int page_num)
 	page = document->page(page_num);
 	if(page == NULL)
 	{
-		QMessageBox::critical(this, "Error", "Error reading page " + QString::number(page_num) + " of file " + document_path);
+		QMessageBox::critical(this, tr("Error"), tr("Error reading page ") + QString::number(page_num) + tr(" of file ") + document_path);
 		return;
 	}
 
 	render_page();
 }
 
-void widget_document::slot_action_triggered(QAction *act)
+void widget_document::slot_field_filled(QAction *act)
 {
 	QRect r = rubber->geometry();
 
@@ -188,7 +219,7 @@ void widget_document::render_page()
 
 	if(image.isNull())
 	{
-		QMessageBox::critical(this, "Error", "Error rendering page " + QString::number(current_page) + " of file " + document_path);
+		QMessageBox::critical(this, tr("Error"), tr("Error rendering page ") + QString::number(current_page) + tr(" of file ") + document_path);
 		return;
 	}
 
@@ -201,4 +232,47 @@ void widget_document::render_page()
 
 	label_image->setPixmap(QPixmap::fromImage(image));
 	label_image->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+}
+
+void widget_document::slot_update_pats()
+{
+	combo_current_pattern->clear();
+	QStringList pattern_names = cpm->get_pattern_names();
+	combo_current_pattern->addItems(pattern_names);
+
+	menu_pats->clear();
+	for(QStringList::size_type i = 0 ; i < pattern_names.size() ; i += 1)
+	{
+		menu_pats->addAction(pattern_names[i]);
+	}
+
+	int i = combo_current_pattern->findText(cpm->get_current_pattern());
+	if(i != -1)
+	{
+		combo_current_pattern->setCurrentIndex(i);
+	}
+	slot_pattern_selected(combo_current_pattern->currentText());
+}
+
+void widget_document::clear_categories()
+{
+	menu_fields->clear();
+}
+
+void widget_document::slot_pattern_selected(QString name)
+{
+	clear_categories();
+	QStringList cats = cpm->get_pattern_fields(cpm->get_pattern(name));
+	for(QStringList::size_type i = 0 ; i < cats.size() ; i += 1)
+	{
+		add_category(cats[i]);
+	}
+	combo_current_pattern->setCurrentText(name);
+
+	cpm->set_current_pattern(name);
+}
+
+void widget_document::slot_pattern_selected(QAction *a)
+{
+	slot_pattern_selected(a->text());
 }

@@ -3,8 +3,10 @@
 #include <QHeaderView>
 #include <QRegularExpression>
 
-/*constructor*/ widget_constructor::widget_constructor(QWidget *parent) : QWidget(parent)
+/*constructor*/ widget_constructor::widget_constructor(core_pattern_manager *c, QWidget *parent) : QWidget(parent)
 {
+	cpm = c;
+
 	layout_main = new QVBoxLayout(this);
 
 	layout_result = new QVBoxLayout;
@@ -19,7 +21,11 @@
 
 	label_preview = new QLabel(this);
 	label_preview->setWordWrap(true);
-	button_apply = new QPushButton("Apply");
+	button_apply = new QPushButton(tr("Apply"));
+
+	button_settings = new QPushButton(tr("Settings"));
+
+	settings = new widget_settings(cpm, this);
 
 	layout_result_name->addWidget(label_preview);
 	layout_result_name->addWidget(button_apply);
@@ -29,9 +35,17 @@
 
 	layout_main->addWidget(table_parts, 1);
 	layout_main->addLayout(layout_result, 1);
+	layout_main->addStretch(1);
+	layout_main->addWidget(button_settings, 0, Qt::AlignRight);
 
 	connect(table_parts, SIGNAL(cellChanged(int,int)), this, SLOT(slot_item_change(int,int)));
 	connect(button_apply, SIGNAL(clicked()), this, SLOT(slot_apply()));
+
+	connect(button_settings, SIGNAL(clicked()), settings, SLOT(exec()));
+	connect(cpm, SIGNAL(signal_current_pattern_set(QString)), this, SLOT(slot_pattern_changed(QString)));
+	connect(cpm, SIGNAL(signal_updated()), this, SLOT(slot_patterns_updated()));
+
+	slot_pattern_changed(cpm->get_current_pattern());
 }
 
 /*destructor*/ widget_constructor::~widget_constructor()
@@ -86,11 +100,6 @@ void widget_constructor::construct()
 	result.replace(re, "\\1");
 
 	label_preview->setText(result);
-}
-
-void widget_constructor::set_pattern(QString p)
-{
-	pattern = p;
 }
 
 void widget_constructor::reset()
@@ -174,4 +183,15 @@ void widget_constructor::slot_apply()
 	{
 		QMessageBox::critical(this, "Error", "File not found");
 	}
+}
+
+void widget_constructor::slot_pattern_changed(QString name)
+{
+	pattern = cpm->get_pattern(name);
+}
+
+void widget_constructor::slot_patterns_updated()
+{
+	slot_pattern_changed(cpm->get_current_pattern());
+	construct();
 }
