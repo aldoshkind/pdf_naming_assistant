@@ -50,7 +50,7 @@
 	connect(combo_current_pattern, SIGNAL(activated(QString)), this, SLOT(slot_pattern_selected(QString)));
 	connect(menu_pats, SIGNAL(triggered(QAction*)), this, SLOT(slot_pattern_selected(QAction*)));
 	connect(cpm, SIGNAL(signal_pattern_set_changed()), this, SLOT(slot_update_pats()));
-	connect(cpm, SIGNAL(signal_pattern_change()), this, SLOT(slot_pattern_changed()));
+	connect(cpm, SIGNAL(signal_pattern_change(QString)), this, SLOT(slot_pattern_changed(QString)));
 
 	slot_update_pats();
 }

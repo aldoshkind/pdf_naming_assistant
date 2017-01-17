@@ -2,4 +2,7 @@
 *.o
 *.so
 *.*~
-
+pdf_naming_assistant
+Makefile
+makefile
+moc*.cpp
