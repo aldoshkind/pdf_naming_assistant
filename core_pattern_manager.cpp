@@ -15,7 +15,7 @@
 	ensure_settings_exists();
 
 	deserialize();
-	emit signal_updated();
+	emit signal_pattern_set_changed();
 }
 
 /*destructor*/ core_pattern_manager::~core_pattern_manager()
@@ -56,7 +56,7 @@ bool core_pattern_manager::create_pattern(QString name)
 
 	serialize();
 
-	emit signal_updated();
+	emit signal_pattern_set_changed();
 	return true;
 }
 
@@ -64,14 +64,14 @@ void core_pattern_manager::remove_pattern(QString name)
 {
 	patterns.erase(name);
 	serialize();
-	emit signal_updated();
+	emit signal_pattern_set_changed();
 }
 
 void core_pattern_manager::set_pattern(QString name, QString pattern)
 {
 	patterns[name] = pattern;
 	serialize();
-	emit signal_updated();
+	emit signal_pattern_change(name);
 }
 
 void core_pattern_manager::deserialize()
@@ -152,8 +152,7 @@ void core_pattern_manager::serialize()
 
 QString core_pattern_manager::get_settings_path()
 {
-#warning
-	return QStandardPaths::standardLocations(QStandardPaths::ConfigLocation).first() + "/TMP_APP_NAME/patters.xml";
+	return QStandardPaths::standardLocations(QStandardPaths::ConfigLocation).first() + "/pdf_naming_assistant/patterns.xml";
 }
 
 void core_pattern_manager::ensure_settings_exists()

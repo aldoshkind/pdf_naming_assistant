@@ -16,7 +16,6 @@ class widget_list : public QWidget
 	QHBoxLayout					*layout_path;
 	QHBoxLayout					*layout_sort;
 
-	QLabel						*label_field_name;
 	QLineEdit					*editbox_dir;
 	QPushButton					*button_select;
 	QPushButton					*button_sort;

@@ -13,8 +13,8 @@
 
 	combo_patterns = new QComboBox(this);
 	label_name = new QLabel(this);
-	button_add = new QPushButton(QIcon::fromTheme("list-add"), "", this);
-	button_remove = new QPushButton(QIcon::fromTheme("list-remove"), "", this);
+	button_add = new QPushButton("Add", this);
+	button_remove = new QPushButton("Remove", this);
 
 	buttons = new QDialogButtonBox(this);
 	button_ok = new QPushButton(tr("OK"), this);
@@ -37,9 +37,9 @@
 	connect(button_ok, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(button_add, SIGNAL(clicked()), this, SLOT(slot_create_pattern()));
 	connect(button_remove, SIGNAL(clicked()), this, SLOT(slot_remove()));
-	connect(cpm, SIGNAL(signal_updated()), this, SLOT(slot_update()));
 	connect(combo_patterns, SIGNAL(activated(QString)), this, SLOT(slot_activate(QString)));
 	connect(lineedit_pattern, SIGNAL(textEdited(QString)), this, SLOT(slot_pattern_change(QString)));
+	connect(cpm, SIGNAL(signal_pattern_set_changed()), this, SLOT(slot_update()));
 	connect(cpm, SIGNAL(signal_current_pattern_set(QString)), this, SLOT(slot_current_pattern_set(QString)));
 
 	slot_update();
@@ -63,6 +63,7 @@ void widget_settings::slot_create_pattern()
 void widget_settings::slot_update()
 {
 	QString last_selected = combo_patterns->currentText();
+	int id = combo_patterns->currentIndex();
 
 	QStringList names = cpm->get_pattern_names();
 	combo_patterns->clear();

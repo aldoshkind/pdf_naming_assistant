@@ -54,7 +54,7 @@ public slots:
 	void					slot_filename				(QString name);
 	void					slot_item_change			(int row, int col);
 	void					slot_apply					();
-	void					slot_patterns_updated		();
+	void					slot_current_pattern_set	(QString name);
 	void					slot_pattern_changed		(QString name);
 
 signals:

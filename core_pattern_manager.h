@@ -39,6 +39,7 @@ public:
 	QStringList						get_pattern_fields					(QString pattern);
 
 signals:
-	void							signal_updated						();
+	void							signal_pattern_set_changed			();
+	void							signal_pattern_change				(QString name);
 	void							signal_current_pattern_set			(QString name);
 };

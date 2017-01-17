@@ -57,15 +57,18 @@ public:
 	/*constructor*/				widget_document					(core_pattern_manager *cpm, QWidget *parent = NULL);
 	/*destructor*/				~widget_document				();
 
-public slots:
-	void						slot_file_select				(QString path);
+private slots:
+	void						slot_pattern_selected			(QString name);
+	void						slot_pattern_selected			(QAction *);
 	void						slot_menu_hide					();
 	void						slot_next_page					();
 	void						slot_prev_page					();
+
+public slots:
+	void						slot_file_select				(QString path);
 	void						slot_field_filled				(QAction *);
 	void						slot_update_pats				();
-	void						slot_pattern_selected			(QString name);
-	void						slot_pattern_selected			(QAction *);
+	void						slot_pattern_changed			(QString name);
 
 signals:
 	void						signal_item						(QString cat, QString value);

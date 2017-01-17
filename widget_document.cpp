@@ -49,7 +49,8 @@
 	connect(menu_fields, SIGNAL(triggered(QAction*)), this, SLOT(slot_field_filled(QAction*)));
 	connect(combo_current_pattern, SIGNAL(activated(QString)), this, SLOT(slot_pattern_selected(QString)));
 	connect(menu_pats, SIGNAL(triggered(QAction*)), this, SLOT(slot_pattern_selected(QAction*)));
-	connect(cpm, SIGNAL(signal_updated()), this, SLOT(slot_update_pats()));
+	connect(cpm, SIGNAL(signal_pattern_set_changed()), this, SLOT(slot_update_pats()));
+	connect(cpm, SIGNAL(signal_pattern_change()), this, SLOT(slot_pattern_changed()));
 
 	slot_update_pats();
 }
@@ -105,7 +106,7 @@ bool widget_document::eventFilter(QObject *, QEvent *ev)
 	{
 		QMouseEvent *mev = dynamic_cast<QMouseEvent*>(ev);
 
-		if(mev->buttons() & Qt::LeftButton == 0)
+		if((mev->buttons() & Qt::LeftButton) == 0)
 		{
 			return false;
 		}
@@ -167,7 +168,7 @@ void widget_document::show_page(unsigned int page_num)
 		return;
 	}
 
-	if(page_num >= document->numPages())
+	if((int)page_num >= document->numPages())
 	{
 		return;
 	}
@@ -275,4 +276,9 @@ void widget_document::slot_pattern_selected(QString name)
 void widget_document::slot_pattern_selected(QAction *a)
 {
 	slot_pattern_selected(a->text());
+}
+
+void widget_document::slot_pattern_changed(QString/* name*/)
+{
+	//
 }

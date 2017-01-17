@@ -5,6 +5,7 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 /*constructor*/ widget_list::widget_list(QWidget *parent) : QWidget(parent)
 {
@@ -14,15 +15,15 @@
 	layout_path = new QHBoxLayout();
 	layout_sort = new QHBoxLayout();
 
-	label_field_name = new QLabel(this);
-	editbox_dir = new QLineEdit("/home/dmitry/documents/литература/всё вместе/", this);
+	QString default_location = QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
+	editbox_dir = new QLineEdit(default_location, this);
+	//editbox_dir = new QLineEdit("/home/dmitry/documents/литература/всё вместе/", this);
 	button_select = new QPushButton("...", this);
 	button_sort = new QPushButton("sort", this);
 	cb_autosort = new QCheckBox("Show sorted", this);
 	cb_autosort->setChecked(true);
 
-	layout_path->addWidget(label_field_name);
-	layout_path->addWidget(editbox_dir);
+	layout_path->addWidget(editbox_dir, 1);
 	layout_path->addWidget(button_select);
 
 	table_files = new QTableWidget(this);

@@ -43,9 +43,9 @@
 
 	connect(button_settings, SIGNAL(clicked()), settings, SLOT(exec()));
 	connect(cpm, SIGNAL(signal_current_pattern_set(QString)), this, SLOT(slot_pattern_changed(QString)));
-	connect(cpm, SIGNAL(signal_updated()), this, SLOT(slot_patterns_updated()));
+	connect(cpm, SIGNAL(signal_pattern_change(QString)), this, SLOT(slot_pattern_changed(QString)));
 
-	slot_pattern_changed(cpm->get_current_pattern());
+	slot_current_pattern_set(cpm->get_current_pattern());
 }
 
 /*destructor*/ widget_constructor::~widget_constructor()
@@ -185,13 +185,16 @@ void widget_constructor::slot_apply()
 	}
 }
 
-void widget_constructor::slot_pattern_changed(QString name)
+void widget_constructor::slot_current_pattern_set(QString name)
 {
 	pattern = cpm->get_pattern(name);
+	construct();
 }
 
-void widget_constructor::slot_patterns_updated()
+void widget_constructor::slot_pattern_changed(QString name)
 {
-	slot_pattern_changed(cpm->get_current_pattern());
-	construct();
+	if(name == cpm->get_current_pattern())
+	{
+		slot_current_pattern_set(name);
+	}
 }
