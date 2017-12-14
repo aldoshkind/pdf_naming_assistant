@@ -19,6 +19,6 @@ class widget_main : public QWidget
 	widget_constructor		*constr;
 
 public:
-	/*constructor*/			widget_main			(QWidget *parent = 0);
+	/*constructor*/			widget_main			(QString path, QWidget *parent = 0);
 	/*destructor*/			~widget_main		();
 };

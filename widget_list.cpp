@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 
-/*constructor*/ widget_list::widget_list(QWidget *parent) : QWidget(parent)
+/*constructor*/ widget_list::widget_list(QString path, QWidget *parent) : QWidget(parent)
 {
 	layout_main = new QVBoxLayout(this);
 	layout_main->setMargin(0);
@@ -15,8 +15,12 @@
 	layout_path = new QHBoxLayout();
 	layout_sort = new QHBoxLayout();
 
-	QString default_location = QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
-	editbox_dir = new QLineEdit(default_location, this);
+	if(path.size() == 0)
+	{
+		path = QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
+	}
+
+	editbox_dir = new QLineEdit(path, this);
 	//editbox_dir = new QLineEdit("/home/dmitry/documents/литература/всё вместе/", this);
 	button_select = new QPushButton("...", this);
 	button_sort = new QPushButton("sort", this);

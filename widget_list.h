@@ -24,7 +24,7 @@ class widget_list : public QWidget
 
 	QTableWidget				*table_files;
 public:
-	/*constructor*/				widget_list					(QWidget *parent = NULL);
+	/*constructor*/				widget_list					(QString path, QWidget *parent = NULL);
 	/*destructor*/				~widget_list				();
 
 private slots:

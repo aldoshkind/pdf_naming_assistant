@@ -1,12 +1,12 @@
 #include "widget_main.h"
 
-/*constructor*/ widget_main::widget_main(QWidget *parent) : QWidget(parent)
+/*constructor*/ widget_main::widget_main(QString path, QWidget *parent) : QWidget(parent)
 {
 	cpm = new core_pattern_manager(this);
 
 	layout_main = new QHBoxLayout(this);
 
-	list = new widget_list(this);
+	list = new widget_list(path, this);
 	doc = new widget_document(cpm, this);
 
 	constr = new widget_constructor(cpm, this);
